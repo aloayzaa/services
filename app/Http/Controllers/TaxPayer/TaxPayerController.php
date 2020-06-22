@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\TaxPayer;
 
+use App\TaxPayer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
@@ -20,8 +21,11 @@ class TaxPayerController extends Controller
         //file_put_contents(public_path('/images'), $txt);
         Storage::disk('public')->put('patron.zip', $txt); */
 
-        $response = Http::get('http://www2.sunat.gob.pe/padron_reducido_ruc.zip');
-        Storage::disk('public')->put('patron_reducido_ruc.zip', $response->body()); 
+  /*       $response = Http::get('http://www2.sunat.gob.pe/padron_reducido_ruc.zip');
+        Storage::disk('public')->put('patron_reducido_ruc.zip', $response->body());  */
+        $tax_payer = TaxPayer::where('ruc', '=', '10452159428')->get();
+        $tax_payer = TaxPayer::paginate(50);
+        return $tax_payer;
     }
 
     /**
