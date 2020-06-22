@@ -42,7 +42,7 @@ class DeleteData extends Command
     {
         try {
             DB::table('tax_payers')->truncate();
-            $this->info('The backup has been proceed successfully.');
+            $this->info('The truncate process has been proceed successfully.');
         
         } catch (Exception $exception) {
             $this->error('The truncate process has been failed.');

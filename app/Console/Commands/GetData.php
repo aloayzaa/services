@@ -47,13 +47,11 @@ class GetData extends Command
         
       //$zip = Zip::open(public_path() . '/storage/padron_reducido_ruc.zip');
    
- 
-
         $zip = Zip::open(storage_path('app/padron_reducido') . '/padron_reducido_ruc.zip');
         $zip->extract(storage_path('app/padron_reducido'));
         $zip->close();  
         
-        $this->info("Descarga y Descomprimido bien");
+        $this->info("Descarga y Descomprimido correctamente");
 
         
     }
