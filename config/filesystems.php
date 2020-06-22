@@ -58,6 +58,7 @@ return [
         'padron_reducido' => [
             'driver' => 'local',
             'root' => storage_path('app/padron_reducido'),
+            'url' => env('APP_URL').'/storage',
         ],
 
         's3' => [

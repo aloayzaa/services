@@ -50,7 +50,7 @@ class GetData extends Command
  
 
         $zip = Zip::open(storage_path('app/padron_reducido') . '/padron_reducido_ruc.zip');
-        $zip->extract(public_path() . '/images');
+        $zip->extract(storage_path('app/padron_reducido'));
         $zip->close();  
         
         $this->info("Descarga y Descomprimido bien");
