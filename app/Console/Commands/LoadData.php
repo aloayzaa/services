@@ -41,7 +41,7 @@ class LoadData extends Command
     {
        // $contents = 'C:/Users/d4ni3/downloads/padron_reducido_ruc/padron_reducido_ruc.txt';
 
-       $url = storage_path('app/patron_reducido/padron_reducido_ruc.txt');
+       $url = storage_path('app/padron_reducido') . '/padron_reducido_ruc.txt';
 
        if(env('APP_ENV') == 'local'){
          $url = 'C:/xampp/htdocs/Laravel/anikama-servicios/storage/app/padron_reducido/padron_reducido_ruc.txt';
