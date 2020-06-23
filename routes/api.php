@@ -19,4 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::get('consulta_ruc', 'TaxPayer\TaxPayerController@index');
+Route::get('contribuyentes', 'TaxPayer\TaxPayerController@index');
+Route::get('consulta_ruc/{ruc}', 'TaxPayer\TaxPayerController@show');

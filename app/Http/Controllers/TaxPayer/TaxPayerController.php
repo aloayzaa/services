@@ -4,50 +4,84 @@ namespace App\Http\Controllers\TaxPayer;
 
 use App\TaxPayer;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Storage;
 
-class TaxPayerController extends Controller
+class TaxPayerController extends ApiController
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-     /*    $txt = file_get_contents('http://www2.sunat.gob.pe/padron_reducido_ruc.zip');
-        //file_put_contents(public_path('/images'), $txt);
-        Storage::disk('public')->put('patron.zip', $txt); */
+        $rules = [
+            'per_page' => 'integer|min:2|max:50'
+        ];
 
-  /*       $response = Http::get('http://www2.sunat.gob.pe/padron_reducido_ruc.zip');
-        Storage::disk('public')->put('patron_reducido_ruc.zip', $response->body());  */
-        $tax_payer = TaxPayer::where('ruc', '=', '10452159428')->get();
-        $tax_payer = TaxPayer::paginate(50);
-        return $tax_payer;
+        $this->validate($request, $rules);
+
+        $perPage = 50;
+
+        if($request->has('per_page')){
+            $perPage = (int)$request->per_page;
+        }
+
+      
+    /*     if($request->has('address_condition')){
+            $address_condition = $request->address_condition;
+            $tax_payers = TaxPayer::where('address_condition', $address_condition)->get();
+            $tax_payers = $this->paginate($tax_payers, $perPage);
+            return $tax_payers; 
+        }
+
+        if($request->has('razon_social')){
+            $razon_social = $request->razon_social;
+            $tax_payers = TaxPayer::where('address_condition', 'LIKE', "%{$razon_social}%")->get();
+            $tax_payers = $this->paginate($tax_payers, $perPage);
+            return $tax_payers; 
+        } */
+
+        $query = TaxPayer::query();
+
+        $query->when(request('address_condition'), function ($q) use ($request) {
+            return $q->where('address_condition', $request->address_condition);
+        });
+        $query->when(request('razon_social'), function ($q) use ($request){  //MAYUSCULAS
+            return $q->where('razon_social', 'LIKE', "%{$request->razon_social}%")->get();
+        });
+
+        $tax_payers = $query->get();
+
+        $tax_payers = $this->paginate($tax_payers, $perPage);
+
+      //  $tax_payers = TaxPayer::paginate($perPage);
+        return $tax_payers;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+/*     protected function paginate(Collection $collection){
+        $rules = [
+            'per_page' => 'integer|min:2|max:50'
+        ];
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        Validator::validate(request()->all(), $rules);
+        
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+
+        if(request()->has('per_page')){
+            $perPage = (int)request()->per_page;
+        }
+
+        $results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+        $paginated = new LengthAwarePaginator($results, $collection->count(), $perPage, $page, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
+
+        $paginated ->appends(request()->all());
+        return $paginated;
+    } */
+
 
     /**
      * Display the specified resource.
@@ -55,42 +89,10 @@ class TaxPayerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($ruc)
     {
-        //
+        $tax_payer = TaxPayer::where('ruc', $ruc)->get();
+        return $tax_payer;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
