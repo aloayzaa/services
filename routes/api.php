@@ -21,3 +21,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('contribuyentes', 'TaxPayer\TaxPayerController@index');
 Route::get('consulta_ruc/{ruc}', 'TaxPayer\TaxPayerController@show');
+Route::get('consulta_dni/{dni}', 'TaxPayer\TaxPayerController@consula_dni');

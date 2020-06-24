@@ -29,59 +29,13 @@ class TaxPayerController extends ApiController
             $perPage = (int)$request->per_page;
         }
 
-      
-    /*     if($request->has('address_condition')){
-            $address_condition = $request->address_condition;
-            $tax_payers = TaxPayer::where('address_condition', $address_condition)->get();
-            $tax_payers = $this->paginate($tax_payers, $perPage);
-            return $tax_payers; 
+        if(!$request->has('address_condition') && !$request->has('razon_social') ){
+            return $tax_payers = TaxPayer::paginate($perPage);
         }
-
-        if($request->has('razon_social')){
-            $razon_social = $request->razon_social;
-            $tax_payers = TaxPayer::where('address_condition', 'LIKE', "%{$razon_social}%")->get();
-            $tax_payers = $this->paginate($tax_payers, $perPage);
-            return $tax_payers; 
-        } */
-
-        $query = TaxPayer::query();
-
-        $query->when(request('address_condition'), function ($q) use ($request) {
-            return $q->where('address_condition', $request->address_condition);
-        });
-        $query->when(request('razon_social'), function ($q) use ($request){  //MAYUSCULAS
-            return $q->where('razon_social', 'LIKE', "%{$request->razon_social}%")->get();
-        });
-
-        $tax_payers = $query->get();
-
-        $tax_payers = $this->paginate($tax_payers, $perPage);
-
-      //  $tax_payers = TaxPayer::paginate($perPage);
+     
+        $tax_payers = $this->filterData($request, $perPage);
         return $tax_payers;
     }
-
-/*     protected function paginate(Collection $collection){
-        $rules = [
-            'per_page' => 'integer|min:2|max:50'
-        ];
-
-        Validator::validate(request()->all(), $rules);
-        
-        $page = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 10;
-
-        if(request()->has('per_page')){
-            $perPage = (int)request()->per_page;
-        }
-
-        $results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
-        $paginated = new LengthAwarePaginator($results, $collection->count(), $perPage, $page, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
-
-        $paginated ->appends(request()->all());
-        return $paginated;
-    } */
-
 
     /**
      * Display the specified resource.
@@ -95,7 +49,9 @@ class TaxPayerController extends ApiController
         return $tax_payer;
     }
 
-    public function consula_dni($dni){
+    public function consula_dni(Request $request){
+
+        $request->merge(['dni' => $request->dni]);
 
         $rules = [
             'dni' => 'size:8'
@@ -103,7 +59,7 @@ class TaxPayerController extends ApiController
 
         $this->validate($request, $rules);
 
-        $tax_payer = TaxPayer::where("10{$request->razon_social}")->get();
+        $tax_payer = TaxPayer::where('ruc', 'LIKE',"10{$request->dni}%")->get();
         return $tax_payer;
     }
 }

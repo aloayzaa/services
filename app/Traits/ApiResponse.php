@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\TaxPayer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -26,23 +27,28 @@ trait ApiResponse{
     }
 
 
-    protected function filterData(Collection $collection)
+//foreach (request()->query() as $query => $value) {
+
+    protected function filterData($request, $perPage)
 	{
-		foreach (request()->query() as $query => $value) {
+        $query = TaxPayer::query();
 
-            if($query == 'name' && $value != ''){
-                $collection = $collection->filter(function ($item) use ($value) {
-                    // replace stristr with your choice of matching function
-                    return false !== stristr($item->name, $value);
-                });
-            }
-		}
-		return $collection;
-	}
+        $query->when(request('address_condition'), function ($q) use ($request) {
+            return $q->where('address_condition', $request->address_condition);
+        });
+        $query->when(request('razon_social'), function ($q) use ($request){  //MAYUSCULAS
+            return $q->where('razon_social', 'LIKE', "%{$request->razon_social}%")->get();
+        });
 
+        $tax_payers = $query->get();
+
+        $tax_payers = $this->paginate($tax_payers, $perPage);
+
+        return $tax_payers;
+    }
+    
     protected function paginate(Collection $collection, $perPage){
    
-        
         $page = LengthAwarePaginator::resolveCurrentPage();
 
         if(request()->has('per_page')){
