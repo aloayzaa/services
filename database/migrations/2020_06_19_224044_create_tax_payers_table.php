@@ -15,7 +15,7 @@ class CreateTaxPayersTable extends Migration
     {
         Schema::create('tax_payers', function (Blueprint $table) {
             $table->id();
-            $table->string('ruc');
+            $table->string('ruc')->unique();
             $table->string('razon_social');
             $table->string('taxpayer_state');
             $table->string('address_condition');
@@ -31,8 +31,7 @@ class CreateTaxPayersTable extends Migration
             $table->string('manzana');
             $table->string('kilometro');
             $table->string('emp_fecha');
-         
-            $table->timestamps();
+            $table->engine = 'MyISAM';
         });
     }
 

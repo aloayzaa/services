@@ -95,4 +95,15 @@ class TaxPayerController extends ApiController
         return $tax_payer;
     }
 
+    public function consula_dni($dni){
+
+        $rules = [
+            'dni' => 'size:8'
+        ];
+
+        $this->validate($request, $rules);
+
+        $tax_payer = TaxPayer::where("10{$request->razon_social}")->get();
+        return $tax_payer;
+    }
 }
