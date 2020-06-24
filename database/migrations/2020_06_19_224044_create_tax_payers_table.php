@@ -32,6 +32,8 @@ class CreateTaxPayersTable extends Migration
             $table->string('kilometro');
             $table->string('emp_fecha');
             $table->engine = 'MyISAM';
+            $table->charset = 'latin1';	
+            $table->collation = 'latin1_general_ci';
         });
     }
 
