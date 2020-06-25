@@ -19,13 +19,15 @@ class Kernel extends ConsoleKernel
 
     protected function scheduleDailyCommands(Schedule $schedule) {
        // $schedule->command('products:set-rating')->dailyAt('01:30');
-        $schedule->command('tax_payers:get_data')->dailyAt(env('GET_DATA_HOUR'));
-        $schedule->command('tax_payers:truncate')->dailyAt(env('DELETE_DATA_HOUR'))->when(function () {  //daily
+        $schedule->command('down --message="Estamos en Mantenimiento (20 min)" --retry=20')->dailyAt(env('MAINTENANCE_HOUR'));
+        $schedule->command('tax_payers:get_data')->dailyAt(env('MAINTENANCE_HOUR')); 
+        $schedule->command('tax_payers:truncate')->dailyAt(env('MAINTENANCE_HOUR'))->when(function () {  
             return Storage::disk('padron_reducido')->exists('padron_reducido_ruc.zip'); //.text
         });
-        $schedule->command('tax_payers:load_data')->dailyAt(env('LOAD_DATA_HOUR'))->when(function () { //daily
-           return Storage::disk('padron_reducido')->exists('padron_reducido_ruc.zip'); //.text
+        $schedule->command('tax_payers:load_data')->dailyAt(env('MAINTENANCE_HOUR'))->when(function () { 
+           return Storage::disk('padron_reducido')->exists('padron_reducido_ruc.zip'); 
        });
+       $schedule->command('up')->dailyAt(env('MAINTENANCE_HOUR'));
 
     }
 

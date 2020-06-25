@@ -29,12 +29,7 @@ class TaxPayerController extends ApiController
             $perPage = (int)$request->per_page;
         }
 
-        if(!$request->has('address_condition') && !$request->has('razon_social') ){
-            return $tax_payers = TaxPayer::paginate($perPage);
-        }
-     
-        $tax_payers = $this->filterData($request, $perPage);
-        return $tax_payers;
+        return $this->showAll($request, $perPage);
     }
 
     /**
@@ -45,8 +40,8 @@ class TaxPayerController extends ApiController
      */
     public function show($ruc)
     {
-        $tax_payer = TaxPayer::where('ruc', $ruc)->get();
-        return $tax_payer;
+        $tax_payer = TaxPayer::where('emp_ruc', $ruc)->first();
+        return $this->showOne($tax_payer);
     }
 
     public function consula_dni(Request $request){
@@ -59,7 +54,7 @@ class TaxPayerController extends ApiController
 
         $this->validate($request, $rules);
 
-        $tax_payer = TaxPayer::where('ruc', 'LIKE',"10{$request->dni}%")->get();
-        return $tax_payer;
+        $tax_payer = TaxPayer::where('emp_ruc', 'LIKE',"10{$request->dni}%")->first();
+        return $this->showOne($tax_payer);
     }
 }

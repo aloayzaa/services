@@ -50,8 +50,7 @@ class LoadData extends Command
         DB::connection()->getPdo()
            ->exec("LOAD DATA LOCAL INFILE '{$url}' 
            INTO TABLE tax_payers CHARACTER SET LATIN1 FIELDS TERMINATED BY '|' LINES TERMINATED BY '\n' IGNORE 1  LINES 
-           (ruc, razon_social, taxpayer_state, address_condition, ubigeo, via_type, via_name, zone_code, zone_type, number, interior, lote, departamento, manzana, kilometro, @emp_fecha)  SET emp_fecha =NOW();");
-
+           (emp_ruc, emp_descripcion, emp_estado_con, emp_con_domicilio, emp_ubigeo, emp_tipo_via, emp_nombre_via, emp_codigo_zona, emp_tipo_zona, emp_numero, emp_interior, emp_lote, emp_departamento, emp_manzana, emp_kilometro, @ultima_actualizacion)  SET ultima_actualizacion =NOW();");
         $this->info("Se cargó la base de datos correctamente");
     }
 }
