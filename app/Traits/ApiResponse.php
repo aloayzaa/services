@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\TaxPayer;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -14,9 +13,9 @@ trait ApiResponse{
         return response()->json($data, $code);
     }
 
-    protected function showOne(Model $model, $code = 200){
+    protected function showOne(Collection $collection, $code = 200){
 
-        return $this->successResponse(['data' => $model], $code);
+        return $this->successResponse(['data' => $collection], $code);
     }
     
     protected function showAll($request, $perPage){

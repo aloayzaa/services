@@ -40,7 +40,7 @@ class TaxPayerController extends ApiController
      */
     public function show($ruc)
     {
-        $tax_payer = TaxPayer::where('emp_ruc', $ruc)->first();
+        $tax_payer = TaxPayer::where('emp_ruc', $ruc)->get();
         return $this->showOne($tax_payer);
     }
 
@@ -54,7 +54,7 @@ class TaxPayerController extends ApiController
 
         $this->validate($request, $rules);
 
-        $tax_payer = TaxPayer::where('emp_ruc', 'LIKE',"10{$request->dni}%")->first();
+        $tax_payer = TaxPayer::where('emp_ruc', 'LIKE',"10{$request->dni}%")->get();
         return $this->showOne($tax_payer);
     }
 }
