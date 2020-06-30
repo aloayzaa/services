@@ -38,9 +38,13 @@ class TaxPayerController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($ruc)
+    public function show($cadena)  //ahora es para ruc y dni
     {
-        $tax_payer = TaxPayer::where('emp_ruc', $ruc)->get();
+        if(strlen($cadena) == 8){
+            $tax_payer = TaxPayer::where('emp_ruc', 'LIKE',"10{$cadena}%")->get();
+            return $this->showOne($tax_payer);
+        }
+        $tax_payer = TaxPayer::where('emp_ruc', $cadena)->get();
         return $this->showOne($tax_payer);
     }
 
@@ -54,13 +58,8 @@ class TaxPayerController extends ApiController
 
         $this->validate($request, $rules);
 
-        $tax_payer = TaxPayer::where('emp_ruc', 'LIKE',"10{$request->dni}%")->get();
-
-        if($tax_payer->isEmpty()){
-            $tax_payer = $this->consulta_in_reniec($request->dni);
-        }
- 
-        return $this->showOne($tax_payer);
+        $person = $this->consulta_in_reniec($request->dni);
+        return $this->showOne($person);
     }
 
 
@@ -87,7 +86,7 @@ class TaxPayerController extends ApiController
         }
         $data = [
             0 => [
-                "emp_descripcion" => "{$nombre[0]} {$nombre[1]} {$nombre[2]}",
+                "nombre" => "{$nombre[0]} {$nombre[1]} {$nombre[2]}",
                 "dni" => $dni,
             ]
         ];
