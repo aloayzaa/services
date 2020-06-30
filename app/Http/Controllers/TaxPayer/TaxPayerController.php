@@ -86,8 +86,10 @@ class TaxPayerController extends ApiController
         }
         $data = [
             0 => [
-                "nombre" => "{$nombre[0]} {$nombre[1]} {$nombre[2]}",
                 "dni" => $dni,
+                "nombres" => "{$nombre[2]}",
+                "apellidoPaterno" => "{$nombre[0]}",
+                "apellidoMaterno" => "{$nombre[1]}",              
             ]
         ];
         return collect($data);
