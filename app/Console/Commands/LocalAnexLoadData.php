@@ -38,7 +38,7 @@ class LocalAnexLoadData extends Command
      */
     public function handle()
     {
-        $url = storage_path('app/local_anexo') . '/padron_reducido_loca_anexo.txt';
+        $url = storage_path('app/local_anexo') . '/padron_reducido_local_anexo.txt';
 
         if(env('APP_ENV') == 'local'){
           $url = 'C:/xampp/htdocs/Laravel/anikama-servicios/storage/app/local_anexo/padron_reducido_local_anexo.txt';
