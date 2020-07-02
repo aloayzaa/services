@@ -18,10 +18,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//TaxPayer
-Route::get('contribuyentes', 'TaxPayer\TaxPayerController@index');
-Route::get('consulta_ruc/{ruc}', 'TaxPayer\TaxPayerController@show');
-Route::get('consulta_dni/{dni}', 'TaxPayer\TaxPayerController@consula_dni');
+//Route::middleware('client')->group(function () {
+    //TaxPayer
+    Route::get('contribuyentes', 'TaxPayer\TaxPayerController@index');
+    Route::get('consulta_ruc/{ruc}', 'TaxPayer\TaxPayerController@show');
+    Route::get('consulta_dni/{dni}', 'TaxPayer\TaxPayerController@consula_dni');
 
-//AnnexedLocal
-Route::get('locales-anexos/{ruc}', 'AnnexedLocal\AnnexedLocalController@show');
+    //AnnexedLocal
+    Route::get('locales-anexos/{ruc}', 'AnnexedLocal\AnnexedLocalController@show'); 
+//});
