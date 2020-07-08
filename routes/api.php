@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Route::middleware('client')->group(function () {
+Route::middleware('client')->group(function () {
     //TaxPayer
     Route::get('contribuyentes', 'TaxPayer\TaxPayerController@index');
     Route::get('consulta_ruc/{ruc}', 'TaxPayer\TaxPayerController@show');
@@ -26,4 +26,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
     //AnnexedLocal
     Route::get('locales-anexos/{ruc}', 'AnnexedLocal\AnnexedLocalController@show'); 
-//});
+});
