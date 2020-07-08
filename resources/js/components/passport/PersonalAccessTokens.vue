@@ -70,7 +70,7 @@
                     <div class="modal-body">
                         <!-- Form Errors -->
                         <div class="alert alert-danger" v-if="form.errors.length > 0">
-                            <p class="mb-0"><strong>Whoops!</strong> Something went wrong!</p>
+                            <p class="mb-0"><strong>Whoops!</strong> Algo salió mal!</p>
                             <br>
                             <ul>
                                 <li v-for="error in form.errors">
@@ -137,8 +137,8 @@
 
                     <div class="modal-body">
                         <p>
-                            Here is your new personal access token. This is the only time it will be shown so don't lose it!
-                            You may now use this token to make API requests.
+                            Aquí está su nuevo token de acceso personal. Esta es la única vez que se mostrará, ¡así que no la pierdas!
+                            Ahora puede usar este token para realizar solicitudes a la API.
                         </p>
 
                         <textarea class="form-control" rows="10">{{ accessToken }}</textarea>

@@ -2,8 +2,6 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <passport-authorized-clients/>
-    </div>
+    <passport-authorized-clients/>
 </div>
 @endsection
