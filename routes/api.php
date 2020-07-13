@@ -25,5 +25,9 @@ Route::middleware('client')->group(function () {
     Route::get('consulta_dni/{dni}', 'TaxPayer\TaxPayerController@consula_dni');
 
     //AnnexedLocal
-    Route::get('locales-anexos/{ruc}', 'AnnexedLocal\AnnexedLocalController@show'); 
+    Route::get('locales-anexos/{ruc}', 'AnnexedLocal\AnnexedLocalController@show');
+    
+    //ExchangeRate
+    Route::get('tcambio', 'ExchangeRate\ExchangeRateController@show'); 
 });
+
