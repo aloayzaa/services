@@ -15,7 +15,7 @@ class CreateAnnexedLocalsTable extends Migration
     {
         Schema::create('annexed_locals', function (Blueprint $table) {
             $table->id();
-            $table->string('loc_ruc')->unique();
+            $table->string('loc_ruc');
             $table->string('loc_ubigeo');
             $table->string('loc_tipo_via');
             $table->string('loc_nombre_via');

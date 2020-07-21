@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
+//Auth::routes();
 Auth::routes(['register' => false]);
 
 Route::get('/home/my-tokens', 'HomeController@getTokens')->name('personal-tokens');
