@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Storage;
 
 class TaxPayerController extends ApiController
 {
+
+    protected $token_reniec;
+
+    public function __construct()
+    {     
+        $this->token_reniec = env('TOKEN_CAPTCHA_RENIEC');
+    }
+ 
+
     /**
      * Display a listing of the resource.
      *
@@ -63,9 +72,9 @@ class TaxPayerController extends ApiController
     }
 
 
-    private function consulta_in_reniec($dni){
+    public function consulta_in_reniec($dni){
         $response = Http::withHeaders([
-            'Requestverificationtoken' => '30OB7qfO2MmL2Kcr1z4S0ttQcQpxH9pDUlZnkJPVgUhZOGBuSbGU4qM83JcSu7DZpZw-IIIfaDZgZ4vDbwE5-L9EPoBIHOOC1aSPi4FS_Sc1:clDOiaq7mKcLTK9YBVGt2R3spEU8LhtXEe_n5VG5VLPfG9UkAQfjL_WT9ZDmCCqtJypoTD26ikncynlMn8fPz_F_Y88WFufli38cUM-24PE1',
+            'Requestverificationtoken' => $this->token_reniec,
             'Content-Type' => 'application/json;chartset=utf-8'
             ])->post('https://aplicaciones007.jne.gob.pe/srop_publico/Consulta/api/AfiliadoApi/GetNombresCiudadano', [
             'CODDNI' => $dni,
