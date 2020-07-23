@@ -4,7 +4,9 @@ namespace App\Http\Controllers\TaxPayer;
 
 use App\TaxPayer;
 use Illuminate\Http\Request;
+use App\Mail\ResolveDniToken;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,10 +14,12 @@ class TaxPayerController extends ApiController
 {
 
     protected $token_reniec;
+    protected $email_soporte;
 
     public function __construct()
     {     
         $this->token_reniec = env('TOKEN_CAPTCHA_RENIEC');
+        $this->email_soporte = env('MAIL_SUPPORT_ANIKAMA');
     }
  
 
@@ -85,6 +89,8 @@ class TaxPayerController extends ApiController
         }
 
         if($response->failed()){
+           //mandar mensaje a soporte 
+           Mail::to($this->email_soporte)->send(new ResolveDniToken());
            return collect([]);
         }
      
