@@ -2,111 +2,110 @@
 
 namespace App\Http\Controllers\ExchangeRate;
 
+use App\Exchange;
+use App\Http\Controllers\ApiController;
+use Carbon\CarbonPeriod;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
-class ExchangeRateController extends Controller
+class ExchangeRateController extends ApiController
 {
     public function show(Request $request){
- 
-        if(!$request->has('mounth') && !$request->has('year')){
-            $response = Http::get('http://www.sunat.gob.pe/cl-at-ittipcam/tcS01Alias');
-        }else{
-            $response = Http::get('http://www.sunat.gob.pe/cl-at-ittipcam/tcS01Alias?mes='.$request->mounth.'&anho='.$request->year.'&accion=init');
+        $v = Validator::make($request->all(),[
+            'mounth' => 'required|numeric|min:1|max:12',
+            'year'   => 'required|numeric|min:2009'
+        ]);
+        if ($v->fails()){
+            return response()->json(['error' => '400 Bad Request.'],400);
         }
-        
-        if($response->failed()){
-            return response()->json(['errors' => array('detalle' => 'Error en la conexión con Sunat')], 400);
-        }
+        $d1 = "{$request->year}-{$request->mounth}-1";
+        $d2 = Carbon::parse($d1)->lastOfMonth()->format('Y-m-d');
+        return Exchange::whereBetween('date',[$d1,$d2])->withCasts([
+            'date' => 'date:d'
+        ])->get();
 
-        $dom = new \DOMDocument();
-        @$dom->loadHTML($response);
-
-
-        $dom->strictErrorChecking = FALSE;
-
-        libxml_use_internal_errors(false);
-        $xml = simplexml_import_dom($dom);
-
-        $fecha = $xml->xpath("//center/h3"); //titulo de fecha sunat
-        $dias = $xml->xpath("//table/tr/td[@class='H3']");
-        $compra_venta = $xml->xpath("//table/tr/td[@class='tne10']");
-
-        $rtn = array();
-
-      //  $periodo = $request->period.'-'.$request->year;  // mes - año
-
-        if( !empty($fecha) )
-        {
-            $periodo = (string)$fecha[0]; //titulo de la fecha a consumir
-        }
-        if( !empty($dias) && !empty($compra_venta) && count((array)$dias) == count((array)$compra_venta)/2 )
-        {
-            foreach($dias as $i => $obj)
-            {
-                $rtn[$i]['dia'] = str_pad(trim((string)$obj->strong),2,0,STR_PAD_LEFT);
-                //$rtn[$i]['fecha'] = str_pad(trim((string)$obj->strong),2,0,STR_PAD_LEFT) . '/'. $mes.'/'.$anio;
-            }
-            $cont = 0;
-            foreach($compra_venta as $i=>$obj)
-            {
-                if( ($i+1)%2==0 )
-                {
-                    $rtn[$cont]['venta'] = trim((string)$obj);
-                    $cont++;
-                }
-                else
-                {
-                    $rtn[$cont]['compra'] = trim((string)$obj);
-                }
-            }
-        }
-
-        $collect = collect($rtn);
-        if($collect->isEmpty()){
-
-            return response()->json(['errors' => array('detalle' => 'No existe data para esa fecha')],422);
-
-        }else {
-
-            $codigo = $request->year.$request->period;
-
-            $compra = 0.00;
-            $venta = 0.00;
-
-            $ultimosunat = $collect->last();
-            $final = collect();
-            for ($i = 1; $i <= 31; $i++) {
-
-                if($i > $ultimosunat['dia'] ){
-                break;
-                  }
-
-                $item = $collect->firstWhere('dia', $i);
-
-             //   dd($item);
-                if($item){
-
-                    $final->push($item);
-
-                    $compra = $item['compra'];
-                    $venta = $item['venta'];
-
-                }else{
-
-                    $final->push([
-                        'dia' => str_pad($i, 2, "0", STR_PAD_LEFT),
-                        'compra' => $compra,
-                        'venta' => $venta]
-                    );
-
-                }
-            }
-     
-
-        }
-
-        return $final;
     }
+
+    public function insertData(){
+        $data = $this->loadData();
+        //dd($data['2009-12']->data[0]->dia);
+        foreach ($data as $v => $e) {
+            $time = Carbon::now()->format('h:i:s A');
+            echo "\n{$v} :: {$time}\n";
+            foreach ($e->data as $a => $u){
+                if (isset($u->compra) && isset($u->venta)){
+                    $o = new Exchange;
+                    $o->date = "{$v}-{$u->dia}";
+                    //echo "{$time}\n";
+                    //printf("%-4u %-10.3f%-10.3f\n",$u->dia,$u->compra,$u->venta);
+                    $o->compra = $u->compra;
+                    $o->venta = $u->venta;
+                    $o->save();
+                }else{
+                    break 2 ;
+                }
+            }
+        }
+        return true;
+    }
+    //este metodo se debe usar todos los dias para agregar el tipo de cambio
+    public function today(){
+        $period =  Carbon::now()->format('Y-m');
+        $data = [];
+        $file = "{$this->formatDate($period)}.json";
+        $exists = Storage::disk('exchange')->exists($file);
+        if ($exists){
+            $data[$this->formatDate($period)] = json_decode(Storage::disk('exchange')->get($file));
+            foreach ($data as $v => $e) {
+                $time = Carbon::now()->format('h:i:s A');
+                echo "\n{$v} :: {$time}\n";
+                foreach ($e->data as $a => $u){
+                    if (isset($u->compra) && isset($u->venta)){
+                        Exchange::firstOrCreate(
+                            ['date' => "{$v}-{$u->dia}"],
+                            [   'compra' => $u->compra,
+                                'venta' => $u->venta
+                            ]
+                        );
+                    }else{
+                        break 2 ;
+                    }
+                }
+            }
+            return true;
+        }
+        return  false;
+    }
+
+    public function loadData(){
+
+        $period = CarbonPeriod::create('2009-12','1 month', Carbon::now());
+        $data = [];
+        // Iterate over the period
+        foreach ($period as $date) {
+            $file = "{$this->formatDate($date->format('Y-m'))}.json";
+            $exists = Storage::disk('exchange')->exists($file);
+            if ($exists) {
+                $data[$this->formatDate($date->format('Y-m'))] = json_decode(Storage::disk('exchange')->get($file));
+            }
+        }
+        // Convert the period to an array of dates
+        return $data;
+    }
+
+    public function formatDate($date){
+        $date = explode("-",$date);
+        $y = $date[0];
+        $m = $date[1];
+        if (intval($m) < 10){
+            $m = explode('0',$m)[1];
+            return "{$date[0]}-{$m}";
+        }
+        return "{$y}-{$m}";
+    }
+
 }
