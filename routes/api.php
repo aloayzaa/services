@@ -26,8 +26,10 @@ Route::middleware('client')->group(function () {
 
     //AnnexedLocal
     Route::get('locales-anexos/{ruc}', 'AnnexedLocal\AnnexedLocalController@show');
-    
-    //ExchangeRate
-    Route::get('tcambio', 'ExchangeRate\ExchangeRateController@show'); 
-});
 
+    //ExchangeRate
+    Route::get('tcambio', 'ExchangeRate\ExchangeRateController@show');
+        // Route::get('tcambio/now');
+        // Route::get('tcambio/{year}');
+        // Route::get('tcambio/{year}/{period}');
+});
