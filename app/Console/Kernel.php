@@ -20,9 +20,13 @@ class Kernel extends ConsoleKernel
 
     protected function scheduleDailyCommands(Schedule $schedule) {
        // $schedule->command('products:set-rating')->dailyAt('01:30');
+        // SE EJECUTA PARA CARHAR EL TIPO DE CAMBIO SIMEPRE A ESTA HORA PERUANA POR LA CONFIGURACION DE LARAVEL
+
+        $schedule->command('Exchange:today')->dailyAt('9:06');
+
         $schedule->command('down --message="Estamos en Mantenimiento (30 min)" --retry=30')->dailyAt(env('MAINTENANCE_HOUR'));
 
-        $schedule->command('Exchange:today')->dailyAt(env('MAINTENANCE_HOUR'));
+
 
         $schedule->command('tax_payers:get_data')->dailyAt(env('MAINTENANCE_HOUR'));
         $schedule->command('tax_payers:truncate')->dailyAt(env('MAINTENANCE_HOUR'))->when(function () {
