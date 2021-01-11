@@ -7,27 +7,56 @@ use App\Http\Controllers\ApiController;
 use Carbon\CarbonPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ExchangeRateController extends ApiController
 {
     public function show(Request $request){
+        //dd($request);
         $v = Validator::make($request->all(),[
             'mounth' => 'required|numeric|min:1|max:12',
-            'year'   => 'required|numeric|min:2009'
+            'year'   => 'required|numeric|min:2009',
+            'day'    => 'numeric|min:1|max:31'
         ]);
         if ($v->fails()){
             return response()->json(['error' => '400 Bad Request.'],400);
+        }else{
+            if (!$request->has('day')){
+                $d1 = "{$request->year}-{$request->mounth}-1";
+                $d2 = Carbon::parse($d1)->lastOfMonth()->format('Y-m-d');
+                return Exchange::whereBetween('date',[$d1,$d2])->withCasts([
+                    'date' => 'date:d'
+                ])->get();
+            }else{
+                $d1 = "{$request->year}-{$request->mounth}-{$request->day}";
+               return  Exchange::where('date',$d1)->withCasts([
+                   'date' => 'date:d'
+               ])->get();
+            }
         }
-        $d1 = "{$request->year}-{$request->mounth}-1";
-        $d2 = Carbon::parse($d1)->lastOfMonth()->format('Y-m-d');
-        return Exchange::whereBetween('date',[$d1,$d2])->withCasts([
+    }
+
+    public function fullDate($year,$month,$day){
+
+       // dd($request);
+        $v = Validator::make([
+                "year"=>$year,
+                "mounth" =>$month,
+                "day"   =>$day
+            ],
+            [
+            'mounth' => 'required|numeric|min:1|max:12',
+            'year'   => 'required|numeric|min:2009',
+            'day'    => 'required|numeric|min:1|max:31'
+        ]);
+
+        if ($v->fails()){
+            return response()->json(['error' => '400 Bad Request.'],400);
+        }
+        return  Exchange::where('date',"{$year}-{$month}-{$day}")->withCasts([
             'date' => 'date:d'
         ])->get();
-
     }
 
     public function insertData(){

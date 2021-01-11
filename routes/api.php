@@ -29,7 +29,5 @@ Route::middleware('client')->group(function () {
 
     //ExchangeRate
     Route::get('tcambio', 'ExchangeRate\ExchangeRateController@show');
-        // Route::get('tcambio/now');
-        // Route::get('tcambio/{year}');
-        // Route::get('tcambio/{year}/{period}');
+    Route::get('tcambio/{year}-{month}-{day}','ExchangeRate\ExchangeRateController@fullDate');
 });
