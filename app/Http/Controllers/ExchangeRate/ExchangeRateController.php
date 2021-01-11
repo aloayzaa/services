@@ -37,6 +37,7 @@ class ExchangeRateController extends ApiController
         }
     }
     //Obtiene los datos por url
+    //otro comentario
     public function fullDate($year,$month,$day){
         $v = Validator::make([
                 "year"=>$year,
