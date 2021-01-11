@@ -22,7 +22,9 @@ class Kernel extends ConsoleKernel
        // $schedule->command('products:set-rating')->dailyAt('01:30');
         // SE EJECUTA PARA CARHAR EL TIPO DE CAMBIO SIMEPRE A ESTA HORA PERUANA POR LA CONFIGURACION DE LARAVEL
 
-        $schedule->command('Exchange:today')->dailyAt('9:06');
+//        $schedule->command('Exchange:today')->dailyAt('09:06');
+        $schedule->command('Exchange:today')->everyMinute();
+
 
         $schedule->command('down --message="Estamos en Mantenimiento (30 min)" --retry=30')->dailyAt(env('MAINTENANCE_HOUR'));
 
