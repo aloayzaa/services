@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
 
     protected function scheduleDailyCommands(Schedule $schedule) {
        // $schedule->command('products:set-rating')->dailyAt('01:30');
-        // SE EJECUTA PARA CARHAR EL TIPO DE CAMBIO SIMEPRE A ESTA HORA PERUANA POR LA CONFIGURACION DE LARAVEL
+
 
 //        $schedule->command('Exchange:today')->dailyAt('09:06');
         $schedule->command('Exchange:today')->everyThreeMinutes();;
