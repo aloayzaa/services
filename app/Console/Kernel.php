@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
 
 
 //        $schedule->command('Exchange:today')->dailyAt('09:06');
-        $schedule->command('Exchange:today')->cron('30-59/5 16 * * *');
+        $schedule->command('Exchange:today')->cron('30-59/2 11 * * *');
 
 
         $schedule->command('down --message="Estamos en Mantenimiento (30 min)" --retry=30')->dailyAt(env('MAINTENANCE_HOUR'));
