@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -19,10 +18,7 @@ class Kernel extends ConsoleKernel
     ];
 
     protected function scheduleDailyCommands(Schedule $schedule) {
-       // $schedule->command('products:set-rating')->dailyAt('01:30');
 
-
-//        $schedule->command('Exchange:today')->dailyAt('09:06');
         $schedule->command('Exchange:today')->cron('*/5 8-9 * * *');
 
 

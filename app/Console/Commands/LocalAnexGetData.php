@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Carbon;
 use ZanySoft\Zip\Zip;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class LocalAnexGetData extends Command
@@ -40,17 +40,30 @@ class LocalAnexGetData extends Command
      */
     public function handle()
     {
-        $response = Http::get('http://www.sunat.gob.pe/descargaPRR/padron_reducido_local_anexo.zip');
-        Storage::disk('local_anexo')->put('local_anexo.zip', $response->body());   
-        
-        
-      //$zip = Zip::open(public_path() . '/storage/padron_reducido_ruc.zip');
-   
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script start {$time}");
+
+        $url = "http://www.sunat.gob.pe/descargaPRR/padron_reducido_local_anexo.zip" ;
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 0);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        Storage::disk('local_anexo')->put('local_anexo.zip', $response);
+
         $zip = Zip::open(storage_path('app/local_anexo') . '/local_anexo.zip');
         $zip->extract(storage_path('app/local_anexo'));
-        $zip->close();  
-        
+        $zip->close();
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
         $this->info("Descarga y Descomprimido correctamente");
+        $this->info("Script end {$time}");
 
     }
 }

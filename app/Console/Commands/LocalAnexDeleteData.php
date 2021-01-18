@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class LocalAnexDeleteData extends Command
@@ -38,13 +39,17 @@ class LocalAnexDeleteData extends Command
      */
     public function handle()
     {
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script start {$time}");
         try {
             DB::table('annexed_locals')->truncate();
             $this->info('The truncate process has been proceed successfully.');
-        
+
         } catch (Exception $exception) {
             $this->error('The truncate process has been failed.');
             $this->error($exception->getMessage());
         }
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script end {$time}");
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class LoadData extends Command
 {
@@ -39,18 +39,22 @@ class LoadData extends Command
      */
     public function handle()
     {
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script start {$time}");
        // $contents = 'C:/Users/d4ni3/downloads/padron_reducido_ruc/padron_reducido_ruc.txt';
-
        $url = storage_path('app/padron_reducido') . '/padron_reducido_ruc.txt';
 
        if(env('APP_ENV') == 'local'){
          $url = 'C:/xampp/htdocs/Laravel/anikama-servicios/storage/app/padron_reducido/padron_reducido_ruc.txt';
        }
-      
+
         DB::connection()->getPdo()
-           ->exec("LOAD DATA LOCAL INFILE '{$url}' 
-           INTO TABLE tax_payers CHARACTER SET LATIN1 FIELDS TERMINATED BY '|' LINES TERMINATED BY '\n' IGNORE 1  LINES 
+           ->exec("LOAD DATA LOCAL INFILE '{$url}'
+           INTO TABLE tax_payers CHARACTER SET LATIN1 FIELDS TERMINATED BY '|' LINES TERMINATED BY '\n' IGNORE 1  LINES
            (emp_ruc, emp_descripcion, emp_estado_con, emp_con_domicilio, emp_ubigeo, emp_tipo_via, emp_nombre_via, emp_codigo_zona, emp_tipo_zona, emp_numero, emp_interior, emp_lote, emp_departamento, emp_manzana, emp_kilometro, @ultima_actualizacion)  SET ultima_actualizacion =NOW();");
         $this->info("Se cargó la base de datos correctamente");
+
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script end {$time}");
     }
 }

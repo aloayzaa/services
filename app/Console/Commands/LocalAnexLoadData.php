@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class LocalAnexLoadData extends Command
@@ -38,16 +39,20 @@ class LocalAnexLoadData extends Command
      */
     public function handle()
     {
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script start {$time}");
         $url = storage_path('app/local_anexo') . '/padron_reducido_local_anexo.txt';
 
         if(env('APP_ENV') == 'local'){
           $url = 'C:/xampp/htdocs/Laravel/anikama-servicios/storage/app/local_anexo/padron_reducido_local_anexo.txt';
         }
-       
+
          DB::connection()->getPdo()
-            ->exec("LOAD DATA LOCAL INFILE '{$url}' 
-            INTO TABLE annexed_locals CHARACTER SET LATIN1 FIELDS TERMINATED BY '|' LINES TERMINATED BY '\n' IGNORE 1  LINES 
+            ->exec("LOAD DATA LOCAL INFILE '{$url}'
+            INTO TABLE annexed_locals CHARACTER SET LATIN1 FIELDS TERMINATED BY '|' LINES TERMINATED BY '\n' IGNORE 1  LINES
             (loc_ruc, loc_ubigeo, loc_tipo_via, loc_nombre_via, loc_codigo_zona, loc_tipo_zona, loc_numero, loc_kilometro, loc_interior, loc_lote, loc_departamento, loc_manzana, @ultima_actualizacion)  SET ultima_actualizacion =NOW();");
          $this->info("Se cargó la base de datos correctamente");
+        $time = Carbon::now()->format('Y-m-d h:i:s A');
+        $this->info("Script end {$time}");
     }
 }
