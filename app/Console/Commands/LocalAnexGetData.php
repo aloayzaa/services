@@ -57,7 +57,6 @@ class LocalAnexGetData extends Command
         curl_close($curl);
 
         Storage::disk('local_anexo')->put('local_anexo.zip', $response);
-
         $zip = Zip::open(storage_path('app/local_anexo') . '/local_anexo.zip');
         $zip->extract(storage_path('app/local_anexo'));
         $zip->close();
