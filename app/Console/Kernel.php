@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
 
     protected function scheduleDailyCommands(Schedule $schedule) {
 
-        $schedule->command('Exchange:today')->cron('*/5 8-9 * * *');
+        //$schedule->command('Exchange:today')->cron('*/5 8-9 * * *');
 
 
         $schedule->command('down --message="Estamos en Mantenimiento (30 min)" --retry=30')->dailyAt(env('MAINTENANCE_HOUR'));
