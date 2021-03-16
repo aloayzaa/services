@@ -12,59 +12,64 @@ use Illuminate\Support\Facades\Validator;
 
 class ExchangeRateController extends ApiController
 {
-    public function show(Request $request){
+    public function show(Request $request)
+    {
         //dd($request);
-        $v = Validator::make($request->all(),[
+        $v = Validator::make($request->all(), [
             'mounth' => 'required|numeric|min:1|max:12',
             'year'   => 'required|numeric|min:2009',
             'day'    => 'numeric|min:1|max:31'
         ]);
-        if ($v->fails()){
-            return response()->json(['error' => '400 Bad Request.'],400);
-        }else{
-            if (!$request->has('day')){
+        if ($v->fails()) {
+            return response()->json(['error' => '400 Bad Request.'], 400);
+        } else {
+            if (!$request->has('day')) {
                 $d1 = "{$request->year}-{$request->mounth}-1";
                 $d2 = Carbon::parse($d1)->lastOfMonth()->format('Y-m-d');
-                return Exchange::whereBetween('date',[$d1,$d2])->withCasts([
+                return Exchange::whereBetween('date', [$d1, $d2])->withCasts([
                     'date' => 'date:d'
                 ])->get();
-            }else{
+            } else {
                 $d1 = "{$request->year}-{$request->mounth}-{$request->day}";
-               return  Exchange::where('date',$d1)->withCasts([
-                   'date' => 'date:d'
-               ])->get();
+                return  Exchange::where('date', $d1)->withCasts([
+                    'date' => 'date:d'
+                ])->get();
             }
         }
     }
 
-    public function fullDate($year,$month,$day){
-        $v = Validator::make([
-                "year"=>$year,
-                "mounth" =>$month,
-                "day"   =>$day
+    public function fullDate($year, $month, $day)
+    {
+        $v = Validator::make(
+            [
+                "year" => $year,
+                "mounth" => $month,
+                "day"   => $day
             ],
             [
-            'mounth' => 'required|numeric|min:1|max:12',
-            'year'   => 'required|numeric|min:2009',
-            'day'    => 'required|numeric|min:1|max:31'
-        ]);
+                'mounth' => 'required|numeric|min:1|max:12',
+                'year'   => 'required|numeric|min:2009',
+                'day'    => 'required|numeric|min:1|max:31'
+            ]
+        );
 
-        if ($v->fails()){
-            return response()->json(['error' => '400 Bad Request.'],400);
+        if ($v->fails()) {
+            return response()->json(['error' => '400 Bad Request.'], 400);
         }
-        return  Exchange::where('date',"{$year}-{$month}-{$day}")->withCasts([
+        return  Exchange::where('date', "{$year}-{$month}-{$day}")->withCasts([
             'date' => 'date:d'
         ])->get();
     }
 
-    public function insertData(){
+    public function insertData()
+    {
         $data = $this->loadData();
         //dd($data['2009-12']->data[0]->dia);
         foreach ($data as $v => $e) {
             $time = Carbon::now()->format('h:i:s A');
             echo "\n{$v} :: {$time}\n";
-            foreach ($e->data as $a => $u){
-                if (isset($u->compra) && isset($u->venta)){
+            foreach ($e->data as $a => $u) {
+                if (isset($u->compra) && isset($u->venta)) {
                     $o = new Exchange;
                     $o->date = "{$v}-{$u->dia}";
                     //echo "{$time}\n";
@@ -72,34 +77,37 @@ class ExchangeRateController extends ApiController
                     $o->compra = $u->compra;
                     $o->venta = $u->venta;
                     $o->save();
-                }else{
-                    break 2 ;
+                } else {
+                    break 2;
                 }
             }
         }
         return true;
     }
     //este metodo se debe usar todos los dias para agregar el tipo de cambio
-    public function today(){
+    public function today()
+    {
         $period =  Carbon::now()->format('Y-m');
         $data = [];
         $file = "{$this->formatDate($period)}.json";
         $exists = Storage::disk('exchange')->exists($file);
-        if ($exists){
+        if ($exists) {
             $data[$this->formatDate($period)] = json_decode(Storage::disk('exchange')->get($file));
             foreach ($data as $v => $e) {
                 $time = Carbon::now()->format('h:i:s A');
                 echo "\n{$v} :: {$time}\n";
-                foreach ($e->data as $a => $u){
-                    if (isset($u->compra) && isset($u->venta)){
-                        Exchange::firstOrCreate(
-                            ['date' => "{$v}-{$u->dia}"],
-                            [   'compra' => $u->compra,
-                                'venta' => $u->venta
-                            ]
-                        );
-                    }else{
-                        break 2 ;
+                foreach ($e->data as $a => $u) {
+                    if (isset($u->compra) && isset($u->venta)) {
+                        if (strlen($u->compra) > 0 && strlen($u->venta) > 0) {
+                            Exchange::firstOrCreate(
+                                ['date' => "{$v}-{$u->dia}"],
+                                ['compra' => $u->compra, 'venta' => $u->venta]
+                            );
+                        } else {
+                            break 2;
+                        }
+                    } else {
+                        break 2;
                     }
                 }
             }
@@ -108,9 +116,10 @@ class ExchangeRateController extends ApiController
         return  false;
     }
 
-    public function loadData(){
+    public function loadData()
+    {
 
-        $period = CarbonPeriod::create('2009-12','1 month', Carbon::now());
+        $period = CarbonPeriod::create('2009-12', '1 month', Carbon::now());
         $data = [];
         // Iterate over the period
         foreach ($period as $date) {
@@ -124,15 +133,15 @@ class ExchangeRateController extends ApiController
         return $data;
     }
 
-    public function formatDate($date){
-        $date = explode("-",$date);
+    public function formatDate($date)
+    {
+        $date = explode("-", $date);
         $y = $date[0];
         $m = $date[1];
-        if (intval($m) < 10){
-            $m = explode('0',$m)[1];
+        if (intval($m) < 10) {
+            $m = explode('0', $m)[1];
             return "{$date[0]}-{$m}";
         }
         return "{$y}-{$m}";
     }
-
 }
