@@ -70,13 +70,17 @@ class ExchangeRateController extends ApiController
             echo "\n{$v} :: {$time}\n";
             foreach ($e->data as $a => $u) {
                 if (isset($u->compra) && isset($u->venta)) {
-                    $o = new Exchange;
-                    $o->date = "{$v}-{$u->dia}";
-                    //echo "{$time}\n";
-                    //printf("%-4u %-10.3f%-10.3f\n",$u->dia,$u->compra,$u->venta);
-                    $o->compra = $u->compra;
-                    $o->venta = $u->venta;
-                    $o->save();
+                    if (strlen($u->compra) > 0 && strlen($u->venta) > 0 ) {
+                        $o = new Exchange;
+                        $o->date = "{$v}-{$u->dia}";
+                        //echo "{$time}\n";
+                        //printf("%-4u %-10.3f%-10.3f\n",$u->dia,$u->compra,$u->venta);
+                        $o->compra = $u->compra;
+                        $o->venta = $u->venta;
+                        $o->save(); 
+                    }else{
+                        break 2 ;
+                    }
                 } else {
                     break 2;
                 }
